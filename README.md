@@ -39,11 +39,15 @@ Opens at `http://localhost:8080`
 npm run build
 ```
 
-Builds the application in the `dist/` folder for deployment.
+Builds a single `index.html` file in the `docs/` folder. Open `docs/index.html` in your browser to use the scanner.
+
+The build bundles all CSS and JavaScript inline into one HTML file using vite-plugin-singlefile.
 
 ### Deployment
 
-Upload the `dist/` folder contents to any static hosting service. Works with GitHub Pages, Netlify, Vercel, or any web server.
+Upload `docs/index.html` to any static hosting service. Works with GitHub Pages, Netlify, Vercel, or any web server.
+
+For GitHub Pages, enable Pages in repository settings and point to the `docs` folder. The included GitHub Actions workflow automatically builds on push to main branch.
 
 ## Usage
 
@@ -85,13 +89,14 @@ src/
 ## Build Scripts
 
 - `npm run dev` - Development server at localhost:8080
-- `npm run build` - Production build to `dist/` folder
+- `npm run build` - Production build to `docs/` folder
 - `npm run preview` - Preview production build locally
 - `npm run lint` - Run ESLint
 
 ## Technical Details
 
 - Client-side only, no server required
+- Single file HTML output for production
 - Security path detection based on common exposures
 - CSV parsing with papaparse
 - File operations with jszip, file-saver, pako
@@ -113,7 +118,7 @@ GPL-3.0. See LICENSE file for details.
 
 This tool is designed for security auditing and analysis of domains and systems you own or have explicit permission to scan. Always ensure you have proper authorization before scanning domains or systems you don't own. The authors are not responsible for any misuse of this software.
 
-This scanner and results are provided strictly for educational and authorized security testing purposes, independently authored and not endorsed by the author's employers or any corporate entity, provided without warranties or guarantees, with no liability accepted for misuse or misapplication.
+This website, apps, scanner and results are provided strictly for educational and authorized security testing purposes, independently authored and not endorsed by the author's employers or any corporate entity, provided without warranties or guarantees, with no liability accepted for misuse or misapplication.
 
 ## Peachycloud Security
 
