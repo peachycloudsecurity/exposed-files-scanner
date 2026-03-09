@@ -15,7 +15,15 @@ Browser-based security scanner to detect exposed sensitive files on domains and 
 
 ### Prerequisites
 
-Node.js 18+ and npm
+1. **Node.js 18+** and **npm**
+2. **CORS Proxy Extension** (mandatory for scans to work) — the scanner runs in the browser and target domains block cross-origin requests; the extension’s background script has `host_permissions` so it can fetch any URL without CORS and return the response to the scanner.
+
+**Install the extension first** (from the `cors-proxy-extension/` folder in this repo):
+
+- **Firefox**: `about:debugging` → This Firefox → Load Temporary Add-on → select `cors-proxy-extension/manifest.json`
+- **Chrome**: `chrome://extensions` → Developer mode ON → Load unpacked → select `cors-proxy-extension/` folder
+
+**Security**: Only these origins can use the proxy: `peachycloudsecurity.com`, `localhost`, `127.0.0.1`. The background script checks `sender.origin` and only allows http/https URLs, so other sites cannot abuse the extension.
 
 ### Installation
 
@@ -31,7 +39,7 @@ npm install
 npm run dev
 ```
 
-Opens at `http://localhost:8080`
+Opens at `http://localhost:8080`. Ensure the CORS Proxy Extension is installed and reload the page; in the console `typeof window.__corsProxyFetch` should be `"function"`.
 
 ### Build
 
@@ -72,9 +80,9 @@ For GitHub Pages, enable Pages in repository settings and point to the `docs` fo
 - **Package Files** - `package.json`, `composer.json`, etc.
 - **API Endpoints** - Admin APIs, encryption keys endpoints
 
-## CORS Handling
+## CORS and the extension
 
-Due to browser CORS restrictions, some downloads may fail for certain domains. The scanner will notify you of CORS-related issues.
+Without the CORS Proxy Extension, the browser blocks cross-origin requests and most scans/downloads fail. Install the extension (see Prerequisites); the scanner automatically uses `window.__corsProxyFetch` when present.
 
 ## Project Structure
 
@@ -84,6 +92,11 @@ src/
 ├── lib/            # Scanner engine and path definitions
 ├── hooks/          # React hooks for scanner logic
 └── utils/          # File handling utilities
+cors-proxy-extension/
+├── manifest.json   # Extension manifest (Chrome + Firefox)
+├── background.js   # Fetches URLs without CORS
+├── content.js      # Bridge between page and background
+└── README.md       # Extension install and usage
 ```
 
 ## Build Scripts
@@ -104,9 +117,9 @@ src/
 
 ## Troubleshooting
 
-**No exposures detected**: Domains may be properly secured, or CORS prevents access.
+**No exposures detected**: Domains may be properly secured, or CORS prevents access. Install and reload the CORS Proxy Extension, then hard refresh the scanner page.
 
-**Download failures**: CORS restrictions on target domain. Try using a CORS proxy or accessing from server-side.
+**Download failures**: Install the CORS Proxy Extension (Prerequisites). Without it, cross-origin requests are blocked by the browser.
 
 **Large scans**: Scanning 1000+ domains may take several minutes. Progress is shown during scanning.
 
