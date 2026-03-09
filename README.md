@@ -9,13 +9,22 @@ Browser-based security scanner to detect exposed sensitive files on domains and 
 - Direct file download capability for detected exposures
 - GitHub repository URL support
 - Browser-based scanning - complete privacy, no data uploaded
-- Single file HTML output for easy deployment
 
 ## Quick Start
 
 ### Prerequisites
 
-Node.js 18+ and npm
+1. **Node.js 18+** and **npm**
+2. **CORS Proxy Extension** (mandatory for scans to work) — the scanner runs in the browser and target domains block cross-origin requests; the extension’s background script has `host_permissions` so it can fetch any URL without CORS and return the response to the scanner.
+
+**Install the extension first** (from the `cors-proxy-extension/` folder in this repo):
+
+- **Firefox**: `about:debugging` → This Firefox → Load Temporary Add-on → select `cors-proxy-extension/manifest.json` (or run `make firefox` in that folder and load the generated `.xpi`)
+- **Chrome**: `chrome://extensions` → Developer mode ON → Load unpacked → select the `cors-proxy-extension/` folder (no build needed; or run `make chrome` there to get a `.zip` for distribution)
+
+No build step is required for local install — the browser loads the extension from the folder. Use the Makefile only if you want a packaged `.xpi` (Firefox) or `.zip` (Chrome) to share or install from file.
+
+**Security**: Only these origins can use the proxy: `peachycloudsecurity.com`, `localhost`, `127.0.0.1`. The background script checks `sender.origin` and only allows http/https URLs, so other sites cannot abuse the extension.
 
 ### Installation
 
@@ -31,23 +40,7 @@ npm install
 npm run dev
 ```
 
-Opens at `http://localhost:8080`
-
-### Build
-
-```bash
-npm run build
-```
-
-Builds a single `index.html` file in the `docs/` folder. Open `docs/index.html` in your browser to use the scanner.
-
-The build bundles all CSS and JavaScript inline into one HTML file using vite-plugin-singlefile.
-
-### Deployment
-
-Upload `docs/index.html` to any static hosting service. Works with GitHub Pages, Netlify, Vercel, or any web server.
-
-For GitHub Pages, enable Pages in repository settings and point to the `docs` folder. The included GitHub Actions workflow automatically builds on push to main branch.
+Opens at `http://localhost:8080`. Ensure the CORS Proxy Extension is installed and reload the page; in the console `typeof window.__corsProxyFetch` should be `"function"`.
 
 ## Usage
 
@@ -72,9 +65,9 @@ For GitHub Pages, enable Pages in repository settings and point to the `docs` fo
 - **Package Files** - `package.json`, `composer.json`, etc.
 - **API Endpoints** - Admin APIs, encryption keys endpoints
 
-## CORS Handling
+## CORS and the extension
 
-Due to browser CORS restrictions, some downloads may fail for certain domains. The scanner will notify you of CORS-related issues.
+Without the CORS Proxy Extension, the browser blocks cross-origin requests and most scans/downloads fail. Install the extension (see Prerequisites); the scanner automatically uses `window.__corsProxyFetch` when present.
 
 ## Project Structure
 
@@ -84,19 +77,21 @@ src/
 ├── lib/            # Scanner engine and path definitions
 ├── hooks/          # React hooks for scanner logic
 └── utils/          # File handling utilities
+cors-proxy-extension/
+├── manifest.json   # Extension manifest (Chrome + Firefox)
+├── background.js   # Fetches URLs without CORS
+├── content.js      # Bridge between page and background
+└── README.md       # Extension install and usage
 ```
 
-## Build Scripts
+## Scripts
 
 - `npm run dev` - Development server at localhost:8080
-- `npm run build` - Production build to `docs/` folder
-- `npm run preview` - Preview production build locally
 - `npm run lint` - Run ESLint
 
 ## Technical Details
 
 - Client-side only, no server required
-- Single file HTML output for production
 - Security path detection based on common exposures
 - CSV parsing with papaparse
 - File operations with jszip, file-saver, pako
@@ -104,9 +99,9 @@ src/
 
 ## Troubleshooting
 
-**No exposures detected**: Domains may be properly secured, or CORS prevents access.
+**No exposures detected**: Domains may be properly secured, or CORS prevents access. Install and reload the CORS Proxy Extension, then hard refresh the scanner page.
 
-**Download failures**: CORS restrictions on target domain. Try using a CORS proxy or accessing from server-side.
+**Download failures**: Install the CORS Proxy Extension (Prerequisites). Without it, cross-origin requests are blocked by the browser.
 
 **Large scans**: Scanning 1000+ domains may take several minutes. Progress is shown during scanning.
 
