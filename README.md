@@ -41,6 +41,25 @@ npm run dev
 ```
 
 Opens at `http://localhost:8080`. Ensure the CORS Proxy Extension is installed and reload the page; in the console `typeof window.__corsProxyFetch` should be `"function"`.
+<<<<<<< HEAD
+=======
+
+### Build
+
+```bash
+npm run build
+```
+
+Builds a single `index.html` file in the `docs/` folder. Open `docs/index.html` in your browser to use the scanner.
+
+The build bundles all CSS and JavaScript inline into one HTML file using vite-plugin-singlefile.
+
+### Deployment
+
+Upload `docs/index.html` to any static hosting service. Works with GitHub Pages, Netlify, Vercel, or any web server.
+
+For GitHub Pages, enable Pages in repository settings and point to the `docs` folder. The included GitHub Actions workflow automatically builds on push to main branch.
+>>>>>>> 8dc38e2db16fcce9fc4dc0feeb94037f14e9cc3d
 
 ## Usage
 
