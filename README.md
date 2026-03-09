@@ -20,8 +20,10 @@ Browser-based security scanner to detect exposed sensitive files on domains and 
 
 **Install the extension first** (from the `cors-proxy-extension/` folder in this repo):
 
-- **Firefox**: `about:debugging` → This Firefox → Load Temporary Add-on → select `cors-proxy-extension/manifest.json`
-- **Chrome**: `chrome://extensions` → Developer mode ON → Load unpacked → select `cors-proxy-extension/` folder
+- **Firefox**: `about:debugging` → This Firefox → Load Temporary Add-on → select `cors-proxy-extension/manifest.json` (or run `make firefox` in that folder and load the generated `.xpi`)
+- **Chrome**: `chrome://extensions` → Developer mode ON → Load unpacked → select the `cors-proxy-extension/` folder (no build needed; or run `make chrome` there to get a `.zip` for distribution)
+
+No build step is required for local install — the browser loads the extension from the folder. Use the Makefile only if you want a packaged `.xpi` (Firefox) or `.zip` (Chrome) to share or install from file.
 
 **Security**: Only these origins can use the proxy: `peachycloudsecurity.com`, `localhost`, `127.0.0.1`. The background script checks `sender.origin` and only allows http/https URLs, so other sites cannot abuse the extension.
 
