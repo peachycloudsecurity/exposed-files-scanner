@@ -111,7 +111,6 @@ export const BACKUP_PATHS = [
   "/db.sql",
   "/database.sql",
   "/dump.sql",
-  "/.DS_Store",
   "/Thumbs.db"
 ];
 

@@ -1,0 +1,44 @@
+{
+  "manifest_version": 3,
+  "name": "CORS Proxy",
+  "version": "1.1",
+  "description": "Proxy fetch requests blocked by CORS for allowed pages only",
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "permissions": [],
+  "host_permissions": ["http://*/*", "https://*/*"],
+  "background": {
+    "scripts": ["background.js"],
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://peachycloudsecurity.com/*",
+        "http://localhost/*",
+        "http://localhost:8080/*",
+        "http://127.0.0.1/*",
+        "http://127.0.0.1:8080/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "action": {
+    "default_title": "CORS Proxy (active)",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "cors-proxy@peachycloudsecurity.com",
+      "strict_min_version": "109.0"
+    }
+  }
+}

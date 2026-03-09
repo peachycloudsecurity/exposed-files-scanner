@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Background circle -->
+  <circle cx="64" cy="64" r="60" fill="#4F46E5" stroke="#312E81" stroke-width="4"/>
+
+  <!-- Proxy arrows - representing data flow through proxy -->
+  <!-- Left arrow -->
+  <path d="M 25 64 L 50 64" stroke="white" stroke-width="6" stroke-linecap="round"/>
+  <path d="M 45 57 L 50 64 L 45 71" fill="none" stroke="white" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Center vertical bar (proxy) -->
+  <rect x="56" y="45" width="16" height="38" fill="white" rx="3"/>
+
+  <!-- Right arrow -->
+  <path d="M 78 64 L 103 64" stroke="white" stroke-width="6" stroke-linecap="round"/>
+  <path d="M 98 57 L 103 64 L 98 71" fill="none" stroke="white" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Small "C" letter at bottom to indicate CORS -->
+  <text x="64" y="105" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="white" text-anchor="middle">C</text>
+</svg>

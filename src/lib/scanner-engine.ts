@@ -38,23 +38,30 @@ import {
 // Helper to generate unique IDs
 const generateId = () => Math.random().toString(36).substring(2, 15);
 
-// Fetch with timeout
+// Fetch with timeout - uses CORS proxy extension when available
 async function fetchWithTimeout(
   url: string,
   timeout: number = 5000
 ): Promise<Response | null> {
-  const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), timeout);
-
   try {
-    const response = await fetch(url, {
-      redirect: 'manual',
-      signal: controller.signal,
-    });
-    clearTimeout(id);
-    return response;
-  } catch (error) {
-    clearTimeout(id);
+    const proxy = (window as any).__corsProxyFetch;
+    if (proxy) {
+      return await proxy(url, { timeout });
+    }
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+    try {
+      const response = await fetch(url, {
+        redirect: 'manual',
+        signal: controller.signal,
+      });
+      clearTimeout(id);
+      return response;
+    } catch (error) {
+      clearTimeout(id);
+      return null;
+    }
+  } catch {
     return null;
   }
 }
@@ -267,23 +274,12 @@ async function checkDsStore(baseUrl: string, timeout: number): Promise<boolean> 
     const response = await fetchWithTimeout(url, timeout);
     
     if (response && response.status === 200) {
-      const contentType = response.headers.get('content-type') || '';
       const text = await readResponseTextWithTimeout(response, timeout);
-      
-      // False positive detection: if response is HTML, it's likely not a real DS_Store file
-      const isHtmlResponse = contentType.includes('text/html') || 
-                             text.toLowerCase().includes('<!doctype') ||
-                             text.toLowerCase().includes('<html') ||
-                             text.toLowerCase().includes('<!DOCTYPE');
-      
-      if (isHtmlResponse) {
-        return false; // False positive - HTML response for DS_Store file
-      }
       
       if (text.startsWith(DS_STORE_HEADER)) {
         return true;
-        }
       }
+    }
     } catch {
       // Ignore errors
   }
@@ -774,9 +770,10 @@ export async function scanDomains(
     await Promise.all(
       batch.map(async (domain) => {
         if (abortSignal?.aborted) return;
-        
+
         progress.currentDomain = domain;
-        
+        onProgress({ ...progress });
+
         // Run all version control checks in parallel (like extension)
         // Only check if the function is enabled in options
         const [isGit, isSvn, isHg, isEnv, isDsStore] = await Promise.all([
@@ -1629,12 +1626,11 @@ export async function downloadFile(url: string, filename?: string): Promise<void
     if (!response) return;
     
     if (response.ok) {
-      // Get content type first
       const contentType = response.headers.get('content-type') || '';
       
-      // Clone response to read text without consuming the original
-      const responseClone = response.clone();
-      const text = await readResponseTextWithTimeout(responseClone, 5000);
+      const buffer = await readResponseArrayBufferWithTimeout(response, 5000);
+      const textDecoder = new TextDecoder();
+      const text = textDecoder.decode(buffer);
       const contentSample = text.substring(0, 1000).toLowerCase();
       
       // Check if response is HTML when it shouldn't be (false positive)
@@ -1692,8 +1688,7 @@ export async function downloadFile(url: string, filename?: string): Promise<void
         }
       }
       
-      // Create blob from original response and download
-      const blob = await response.blob();
+      const blob = new Blob([buffer]);
       const name = filename || urlPath.split('/').pop() || 'download';
       saveAs(blob, name);
     } else {
